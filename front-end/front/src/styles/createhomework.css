@@ -1,6 +1,5 @@
 .create-homework{
 display: grid; 
-  display: grid;
 grid-template-columns: 1fr 4fr;
 grid-template-rows: repeat(5, 1fr);
 grid-column-gap: 10px;

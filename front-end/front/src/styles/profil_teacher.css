@@ -11,7 +11,7 @@
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    margin: -9px 30px 30px 30px; 
+    margin: -9px auto 30px auto;
     box-sizing: border-box;
 }
 .data-table {

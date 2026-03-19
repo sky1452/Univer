@@ -17,7 +17,7 @@ function handleCreateHomework() { ///ф-ия создания задания, о
       title: nameHomework,
       description: description,
       deadline: deadline + ":00+03:00",
-      max_score: parseInt(maxScore, 10)
+      max_score: parseInt(maxScore, 10),
     };
     console.log("Отправляемые данные:", data);
     fetch("http://localhost:8081/createHomework", {

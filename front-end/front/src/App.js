@@ -8,11 +8,12 @@ import { SchedulePage } from './components/schedule_teacher';
 import  Login  from './components/vhod';
 import{ ProgressPage } from './components/progress_teacher'
 import {HomeworkPage_id} from './components/zadaniya_perexod';
-
+import {Homework_studentPage} from './components/zadaniya_student';
+import {HomeworkStudentPage_id} from './components/zadaniya_perexod_student';
 import { MainLayout_student } from './components/MainLayout_student';
 import { Datap_student } from './components/profil_student';
 import { SchedulePage_student } from './components/schedule_student';
-import{ ProgressPage_student } from './components/progress_student'
+import{ ProgressPage_student } from './components/progress_student';
 
 import './styles/zadaniya_perexod.css';
 import './styles/layout.css';
@@ -23,7 +24,8 @@ import './styles/schedule_teacher.css';
 import './styles/progress_teacher.css';
 import './styles/progress_student.css';
 import './styles/zadaniya_teacher.css';
-import './styles/createhomewok.css';
+import './styles/createhomework.css';
+import './styles/createdhomework.css';
 
 function GroupsPage() {
   return <h2>Учебные группы и дисциплины</h2>;
@@ -38,9 +40,7 @@ function Rating_studentPage() {
 function Events_studentPage() {
   return <h2>Предстоящие события</h2>;
 }
-function Homework_studentPage() {
-  return <div className="progresst">Мои задания</div>
-}
+
 function App() {
   return (
     <Router>
@@ -69,7 +69,11 @@ function App() {
           <Route path="/schedule_student" element={<SchedulePage_student />} />
           <Route path="/events_student" element={<Events_studentPage />} />{/*костыль*/}
           <Route path="/progress_student" element={<ProgressPage_student />} />
-          <Route path="/homework_student" element={<Homework_studentPage />} /> {/*костыль*/}
+          <Route path="/homework_student" element={<Homework_studentPage />} />
+           <Route 
+          path="/homework_student/:disciplineId/:disciplineSlug" 
+          element={<HomeworkStudentPage_id />} 
+        /> {/*костыль*/}
         </Route>
       </Routes>
     </Router>
