@@ -14,6 +14,7 @@ import { MainLayout_student } from './components/MainLayout_student';
 import { Datap_student } from './components/profil_student';
 import { SchedulePage_student } from './components/schedule_student';
 import{ ProgressPage_student } from './components/progress_student';
+import{ MyHomeworks } from './components/my_homeworks';
 
 import './styles/zadaniya_perexod_student.css';
 import './styles/zadaniya_perexod.css';
@@ -27,6 +28,7 @@ import './styles/progress_student.css';
 import './styles/zadaniya_teacher.css';
 import './styles/createhomework.css';
 import './styles/createdhomework.css';
+
 
 function GroupsPage() {
   return <h2>Учебные группы и дисциплины</h2>;
@@ -74,7 +76,11 @@ function App() {
            <Route 
           path="/homework_student/:disciplineId/:disciplineSlug" 
           element={<HomeworkStudentPage_id />} 
-        /> {/*костыль*/}
+        />
+        <Route 
+          path="/homework_student/:disciplineId/:disciplineSlug/:taskId" 
+          element={<MyHomeworks/>} 
+        />
         </Route>
       </Routes>
     </Router>
