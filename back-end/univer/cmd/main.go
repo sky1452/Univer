@@ -99,6 +99,7 @@ func main() {
 	router.HandleFunc("/discipline/{disciplineId}", h.GetDisciplineById).Methods("GET")
 	router.HandleFunc("/createHomework", h.CreateHomeworkHandler).Methods("POST")
 	router.HandleFunc("/getHomeworks", h.GetHomeworks).Methods("GET")
+	router.HandleFunc("/tasks/{id}", h.GetHomeworkByID).Methods("GET")
 	// 🔹 Swagger
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
