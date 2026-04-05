@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,6 +11,11 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+type fileItem struct {
+	FileURL  string
+	FileName string
+}
 
 func extractFileNameFromURLDownload(fileURL string) string {
 	parts := strings.Split(fileURL, "/")
@@ -35,11 +41,6 @@ func extractFileNameFromURLDownload(fileURL string) string {
 	return decodedName[underscoreIndex+1:]
 }
 
-type fileItem struct {
-	FileURL  string
-	FileName string
-}
-
 func sanitizeASCIIFileName(name string) string {
 	replacer := strings.NewReplacer(
 		`"`, "",
@@ -47,6 +48,66 @@ func sanitizeASCIIFileName(name string) string {
 		"\n", "",
 	)
 	return replacer.Replace(name)
+}
+
+func (h *Handler) buildStudentTaskFiles(ctx context.Context, taskID int, studentID int) ([]fileItem, error) {
+	submissionRows, err := h.DB.Query(ctx, `
+		SELECT id
+		FROM submissions
+		WHERE task_id = $1 AND student_id = $2
+		ORDER BY id DESC
+	`, taskID, studentID)
+	if err != nil {
+		return nil, err
+	}
+	defer submissionRows.Close()
+
+	var files []fileItem
+
+	for submissionRows.Next() {
+		var submissionID int
+
+		if err := submissionRows.Scan(&submissionID); err != nil {
+			return nil, err
+		}
+
+		fileRows, err := h.DB.Query(ctx, `
+			SELECT file_url
+			FROM submission_files
+			WHERE submission_id = $1
+			ORDER BY id
+		`, submissionID)
+		if err != nil {
+			return nil, err
+		}
+
+		for fileRows.Next() {
+			var fileURL string
+
+			if err := fileRows.Scan(&fileURL); err != nil {
+				fileRows.Close()
+				return nil, err
+			}
+
+			files = append(files, fileItem{
+				FileURL:  fileURL,
+				FileName: extractFileNameFromURLDownload(fileURL),
+			})
+		}
+
+		if err := fileRows.Err(); err != nil {
+			fileRows.Close()
+			return nil, err
+		}
+
+		fileRows.Close()
+	}
+
+	if err := submissionRows.Err(); err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
 
 func (h *Handler) DownloadStudentSubmissionFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -85,65 +146,9 @@ func (h *Handler) DownloadStudentSubmissionFileHandler(w http.ResponseWriter, r 
 		return
 	}
 
-	submissionRows, err := h.DB.Query(ctx, `
-		SELECT id
-		FROM submissions
-		WHERE task_id = $1 AND student_id = $2
-		ORDER BY id DESC
-	`, taskID, studentID)
+	files, err := h.buildStudentTaskFiles(ctx, taskID, studentID)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Ошибка при получении submissions: %v", err), http.StatusInternalServerError)
-		return
-	}
-	defer submissionRows.Close()
-
-	var files []fileItem
-
-	for submissionRows.Next() {
-		var submissionID int
-
-		if err := submissionRows.Scan(&submissionID); err != nil {
-			http.Error(w, fmt.Sprintf("Ошибка при чтении submissions: %v", err), http.StatusInternalServerError)
-			return
-		}
-
-		fileRows, err := h.DB.Query(ctx, `
-			SELECT file_url
-			FROM submission_files
-			WHERE submission_id = $1
-			ORDER BY id
-		`, submissionID)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Ошибка при получении файлов: %v", err), http.StatusInternalServerError)
-			return
-		}
-
-		for fileRows.Next() {
-			var fileURL string
-
-			if err := fileRows.Scan(&fileURL); err != nil {
-				fileRows.Close()
-				http.Error(w, fmt.Sprintf("Ошибка при чтении файла: %v", err), http.StatusInternalServerError)
-				return
-			}
-
-			files = append(files, fileItem{
-				FileURL:  fileURL,
-				FileName: extractFileNameFromURLDownload(fileURL),
-			})
-		}
-
-		if err := fileRows.Err(); err != nil {
-			fileRows.Close()
-			http.Error(w, fmt.Sprintf("Ошибка при обработке файлов: %v", err), http.StatusInternalServerError)
-			return
-		}
-
-		fileRows.Close()
-	}
-
-	if err := submissionRows.Err(); err != nil {
-		http.Error(w, fmt.Sprintf("Ошибка при обработке submissions: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Ошибка получения файлов: %v", err), http.StatusInternalServerError)
 		return
 	}
 

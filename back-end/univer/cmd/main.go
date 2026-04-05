@@ -8,9 +8,10 @@ import (
 	"univer/internal/handlers"
 	"univer/pkg/db"
 
+	_ "univer/docs"
+
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
-	_ "univer/docs"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -18,7 +19,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-// @title Univer	
+// @title Univer
 // @version 1.0
 // @description Приложение для автоматизации учебных процессов
 // @host localhost:8081
@@ -52,10 +53,9 @@ func main() {
 	}
 	defer conn.Close()
 
-	// 🔥 S3 ИНИЦИАЛИЗАЦИЯ
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String("ru-central1"),
-		Endpoint: aws.String("https://storage.yandexcloud.net"),
+		Region:           aws.String("ru-central1"),
+		Endpoint:         aws.String("https://storage.yandexcloud.net"),
 		S3ForcePathStyle: aws.Bool(true),
 		Credentials: credentials.NewStaticCredentials(
 			"YCAJE25LnH-jAwtkZ4pWouxZs",
@@ -68,7 +68,6 @@ func main() {
 
 	router := mux.NewRouter()
 
-	// 🔥 ПЕРЕДАЁМ S3 В HANDLER
 	h := handlers.NewHandler(conn.Pool, cfg, s3Client)
 
 	router.Use(corsMiddleware)
@@ -110,11 +109,17 @@ func main() {
 	router.HandleFunc("/getHomeworks", h.GetHomeworks).Methods("GET")
 	router.HandleFunc("/tasks/{id}", h.GetHomeworkByID).Methods("GET")
 	router.HandleFunc("/submissions", h.UploadSubmission).Methods("POST", "OPTIONS")
-	router.HandleFunc("/progress/{userId}", h.GetStudentProgressHandler).Methods("GET")
+	router.HandleFunc("/progress/{userId}/{disciplineId}", h.GetStudentProgressHandler).Methods("GET")
 	router.HandleFunc("/tasks/{taskId}/student/{userId}/files", h.GetStudentSubmissionFilesHandler).Methods("GET")
-	router.HandleFunc("/tasks/{taskId}/student/{userId}/files/{fileIndex}/download", h.DownloadStudentSubmissionFileHandler,).Methods("GET")
+	router.HandleFunc("/tasks/{taskId}/student/{userId}/files/{fileIndex}/download", h.DownloadStudentSubmissionFileHandler).Methods("GET")
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
-
+	router.HandleFunc("/getHomeworks/{userId}/{group}/{disciplineId}", h.GetHomeworksByFilters)
+	router.HandleFunc("/getHomework/{userId}/{group}/{disciplineId}/{homeworkId}", h.GetHomeworkByIDAndFilters).Methods("GET")
+	router.HandleFunc("/homeworks/{taskId}/group/{group}/submissions", h.GetHomeworkSubmissionsByGroup).Methods("GET")
+	router.HandleFunc("/submissions/{submissionId}/score", h.UpdateSubmissionScoreHandler).Methods("PUT")
+	router.HandleFunc("/tasks/{taskId}/student/{userId}/score", h.GetStudentSubmissionScoreHandler).Methods("GET")
+	router.HandleFunc("/tasks/{taskId}/student/{userId}/submission", h.UpdateHomeworkAnswer).Methods("PUT")
+	
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 	log.Println("Сервер запущен на", addr)
 	log.Fatal(http.ListenAndServe(addr, router))

@@ -10,10 +10,11 @@ import (
 )
 
 type ProgressResponse struct {
-	Success   bool `json:"success"`
-	UserID    int  `json:"userId"`
-	StudentID int  `json:"studentId"`
-	Progress  int  `json:"progress"`
+	Success      bool `json:"success"`
+	UserID       int  `json:"userId"`
+	StudentID    int  `json:"studentId"`
+	DisciplineID int  `json:"disciplineId"`
+	Progress     int  `json:"progress"`
 }
 
 func (h *Handler) GetStudentProgressHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,9 +26,12 @@ func (h *Handler) GetStudentProgressHandler(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 
 	vars := mux.Vars(r)
+
 	userIDStr := vars["userId"]
-	if userIDStr == "" {
-		http.Error(w, "userId is required", http.StatusBadRequest)
+	disciplineIDStr := vars["disciplineId"]
+
+	if userIDStr == "" || disciplineIDStr == "" {
+		http.Error(w, "userId and disciplineId are required", http.StatusBadRequest)
 		return
 	}
 
@@ -37,22 +41,32 @@ func (h *Handler) GetStudentProgressHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	disciplineID, err := strconv.Atoi(disciplineIDStr)
+	if err != nil {
+		http.Error(w, "Некорректный disciplineId", http.StatusBadRequest)
+		return
+	}
+
 	var progress int
 	err = h.DB.QueryRow(ctx, `
-		SELECT COUNT(DISTINCT task_id)
-		FROM submissions
-		WHERE student_id = $1
-	`, studentID).Scan(&progress)
+		SELECT COUNT(DISTINCT s.task_id)
+		FROM submissions s
+		JOIN homeworks h ON s.task_id = h.id
+		WHERE s.student_id = $1
+		  AND h.discipline_id = $2
+	`, studentID, disciplineID).Scan(&progress)
+
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Ошибка при подсчёте прогресса: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	resp := ProgressResponse{
-		Success:   true,
-		UserID:    studentID,
-		StudentID: studentID,
-		Progress:  progress,
+		Success:      true,
+		UserID:       studentID,
+		StudentID:    studentID,
+		DisciplineID: disciplineID,
+		Progress:     progress,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
