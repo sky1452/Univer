@@ -12,7 +12,7 @@ import (
 )
 
 type LoginRequest struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 	Role     int    `json:"role"`
 }
@@ -32,18 +32,37 @@ type LoginResponse struct {
 }
 
 func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(LoginResponse{
+			Success: false,
+			Message: "Метод не поддерживается",
+		})
 		return
 	}
 
 	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Неверный формат запроса", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(LoginResponse{
+			Success: false,
+			Message: "Неверный формат запроса",
+		})
 		return
 	}
 
-	log.Printf("DEBUG: login attempt username='%s' role=%d", req.Username, req.Role)
+	if req.Email == "" || req.Password == "" || req.Role == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(LoginResponse{
+			Success: false,
+			Message: "Email, пароль и роль обязательны",
+		})
+		return
+	}
+
+	log.Printf("DEBUG: login attempt email='%s' role=%d", req.Email, req.Role)
 
 	var userID int
 	var hashedPassword, fullName, email, position, departament string
@@ -53,23 +72,34 @@ func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var avatarBytes []byte
 
 	err := h.DB.QueryRow(r.Context(),
-		`SELECT user_id, password, 
-				role_id, 
-				name, 
-				email, 
-				COALESCE(properties->>'position', '') AS position,     -- FIX: COALESCE
-				COALESCE(properties->>'departament', '') AS departament, -- FIX: COALESCE
-				stazh,
-				dop,
-				avatar
-		 FROM users 
-		 WHERE name = $1`, req.Username,
-	).Scan(&userID, &hashedPassword, &roleFromDB, &fullName, &email,
-		&position, &departament, &stazh, &dop, &avatarBytes)
+		`SELECT user_id,
+		        password,
+		        role_id,
+		        name,
+		        email,
+		        COALESCE(properties->>'position', ''),
+		        COALESCE(properties->>'departament', ''),
+		        stazh,
+		        dop,
+		        avatar
+		 FROM users
+		 WHERE email = $1`,
+		req.Email,
+	).Scan(
+		&userID,
+		&hashedPassword,
+		&roleFromDB,
+		&fullName,
+		&email,
+		&position,
+		&departament,
+		&stazh,
+		&dop,
+		&avatarBytes,
+	)
 
 	if err != nil {
-		// DEBUG: выводим реальную ошибку SQL
-		log.Printf("[Login failed] Query error for username='%s': %v", req.Username, err)
+		log.Printf("[Login failed] Query error for email='%s': %v", req.Email, err)
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(LoginResponse{
 			Success: false,
@@ -78,10 +108,8 @@ func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-
 	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(req.Password)); err != nil {
-		log.Printf("[Login failed] Неверный пароль для пользователя: %s (%s)", req.Username, fullName)
+		log.Printf("[Login failed] Неверный пароль для пользователя: %s (%s)", req.Email, fullName)
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(LoginResponse{
 			Success: false,
@@ -92,7 +120,7 @@ func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if req.Role != roleFromDB {
 		log.Printf("[Login failed] Роль не совпадает для пользователя: %s (%s). Ожидалось %d, пришло %d",
-			req.Username, fullName, roleFromDB, req.Role)
+			req.Email, fullName, roleFromDB, req.Role)
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(LoginResponse{
 			Success: false,
@@ -105,6 +133,7 @@ func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if stazh.Valid {
 		realStazh = int(stazh.Int64)
 	}
+
 	realDop := ""
 	if dop.Valid {
 		realDop = dop.String
@@ -115,8 +144,8 @@ func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		avatarData = "data:image/jpeg;base64," + base64.StdEncoding.EncodeToString(avatarBytes)
 	}
 
-	log.Printf("[Login success] Пользователь вошёл: %s (%s)", req.Username, fullName)
-	w.Header().Set("Content-Type", "application/json")
+	log.Printf("[Login success] Пользователь вошёл: %s (%s)", req.Email, fullName)
+
 	json.NewEncoder(w).Encode(LoginResponse{
 		Success:     true,
 		Role:        roleFromDB,
