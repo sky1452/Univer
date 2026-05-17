@@ -10,7 +10,9 @@ const datap = [
 ];
 
 export function Datap_student() {
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")) || {});
+  const [user, setUser] = useState(
+    () => JSON.parse(localStorage.getItem("user")) || {},
+  );
   const [dop, setDop] = useState("");
   const [avatar, setAvatar] = useState(user.avatar || "");
   const [disciplines, setDisciplines] = useState([]);
@@ -19,75 +21,75 @@ export function Datap_student() {
   const disciplineRef = useRef(null);
 
   useEffect(() => {
-  if (!user?.userId) return;
-  const fetchDisciplines = async () => {
-    try {
-      const res = await fetch(`http://localhost:8081/mySchedule/${user.userId}`);
-      if (res.ok) {
-        const data = await res.json();
+    if (!user?.userId) return;
+    const fetchDisciplines = async () => {
+      try {
+        const res = await fetch(`${API_URL}/mySchedule/${user.userId}`);
+        if (res.ok) {
+          const data = await res.json();
 
-        const mapped = data
-          .map(d => {
-            let id, name;
-            if (d.lectureId) {
-              id = d.lectureId;
-              name = d.lectureName;
-            } else if (d.labId) {
-              id = d.labId;
-              name = d.labName;
-            } else if (d.practicId) {
-              id = d.practicId;
-              name = d.practicName;
-            }
-            return { id, name };
-          })
-          .filter(d => d.name);
+          const mapped = data
+            .map((d) => {
+              let id, name;
+              if (d.lectureId) {
+                id = d.lectureId;
+                name = d.lectureName;
+              } else if (d.labId) {
+                id = d.labId;
+                name = d.labName;
+              } else if (d.practicId) {
+                id = d.practicId;
+                name = d.practicName;
+              }
+              return { id, name };
+            })
+            .filter((d) => d.name);
 
-        // уникальные дисциплины только по имени
-        const uniqueDisciplines = Array.from(
-          new Map(mapped.map(d => [d.name, d])).values()
-        );
+          // уникальные дисциплины только по имени
+          const uniqueDisciplines = Array.from(
+            new Map(mapped.map((d) => [d.name, d])).values(),
+          );
 
-        // сортировка по алфавиту
-        uniqueDisciplines.sort((a, b) => a.name.localeCompare(b.name));
+          // сортировка по алфавиту
+          uniqueDisciplines.sort((a, b) => a.name.localeCompare(b.name));
 
-        setDisciplines(uniqueDisciplines);
-      } else {
-        console.error("Ошибка при загрузке дисциплин");
+          setDisciplines(uniqueDisciplines);
+        } else {
+          console.error("Ошибка при загрузке дисциплин");
+        }
+      } catch (err) {
+        console.error("Ошибка сети при загрузке дисциплин", err);
       }
-    } catch (err) {
-      console.error("Ошибка сети при загрузке дисциплин", err);
-    }
-  };
-  fetchDisciplines();
-}, [user]);
+    };
+    fetchDisciplines();
+  }, [user]);
 
   useEffect(() => {
-  if (!user?.userId) return;
+    if (!user?.userId) return;
 
-  const savedGroup = localStorage.getItem(`group_${user.userId}`);
-  if (savedGroup) {
-    setGroup(savedGroup);
-    return;
-  }
-
-  const fetchGroup = async () => {
-    try {
-      const res = await fetch(`http://localhost:8081/myGroup/${user.userId}`);
-      if (res.ok) {
-        const data = await res.json();
-        const groupName = data.Name || "";
-        setGroup(groupName);
-        localStorage.setItem(`group_${user.userId}`, groupName);
-      } else {
-        console.error("Ошибка при загрузке группы студента");
-      }
-    } catch (err) {
-      console.error("Ошибка сети при загрузке группы студента", err);
+    const savedGroup = localStorage.getItem(`group_${user.userId}`);
+    if (savedGroup) {
+      setGroup(savedGroup);
+      return;
     }
-  };
-  fetchGroup();
-}, [user]);
+
+    const fetchGroup = async () => {
+      try {
+        const res = await fetch(`${API_URL}/myGroup/${user.userId}`);
+        if (res.ok) {
+          const data = await res.json();
+          const groupName = data.Name || "";
+          setGroup(groupName);
+          localStorage.setItem(`group_${user.userId}`, groupName);
+        } else {
+          console.error("Ошибка при загрузке группы студента");
+        }
+      } catch (err) {
+        console.error("Ошибка сети при загрузке группы студента", err);
+      }
+    };
+    fetchGroup();
+  }, [user]);
 
   useEffect(() => {
     if (user) {
@@ -96,11 +98,9 @@ export function Datap_student() {
     }
   }, [user]);
 
-  
-
   const handleSavedop = async () => {
     try {
-      const response = await fetch(`http://localhost:8081/api/update-dop`, {
+      const response = await fetch(`${API_URL}/api/update-dop`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: user.fullName, dop }),
@@ -131,7 +131,7 @@ export function Datap_student() {
     reader.onloadend = async () => {
       const base64 = reader.result.split(",")[1];
       try {
-        const response = await fetch("http://localhost:8081/api/update-avatar", {
+        const response = await fetch("${API_URL}/api/update-avatar", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: user.fullName, avatar: base64 }),
@@ -155,7 +155,10 @@ export function Datap_student() {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (disciplineRef.current && !disciplineRef.current.contains(event.target)) {
+      if (
+        disciplineRef.current &&
+        !disciplineRef.current.contains(event.target)
+      ) {
         setOpenDiscipline(false);
       }
     }
@@ -181,14 +184,16 @@ export function Datap_student() {
               {user.email}
             </td>
             <td align="center">
-              <img src={avatar} alt="" style={{ maxWidth: "256px", maxHeight: "256px" }} />
+              <img
+                src={avatar}
+                alt=""
+                style={{ maxWidth: "256px", maxHeight: "256px" }}
+              />
             </td>
           </tr>
           <tr>
             <td>{datap[1].name}</td>
-            <td>
-             {group}
-            </td>
+            <td>{group}</td>
           </tr>
           <tr>
             <td>{datap[2].name}</td>
@@ -198,22 +203,29 @@ export function Datap_student() {
                   <div
                     className="button_progress1"
                     onClick={() => setOpenDiscipline(!openDiscipline)}
-                    style={{textAlign: "center"}}>
+                    style={{ textAlign: "center" }}
+                  >
                     Дисциплины
                   </div>
                   {openDiscipline && (
-                    <div className="dropdown-menu" style={{textAlign: "center"}}>
+                    <div
+                      className="dropdown-menu"
+                      style={{ textAlign: "center" }}
+                    >
                       {disciplines.length > 0 ? (
-                      disciplines.map((d) => (
-                       <div key={d.id} className="dropdown-item">
-                           {d.name}
-                            </div>
-                            ))
-                            ) : (
-                            <div className="dropdown-item" style={{ color: "#999", textAlign: "center" }}>
-                              Нет дисциплин
-                               </div>
-                                )}
+                        disciplines.map((d) => (
+                          <div key={d.id} className="dropdown-item">
+                            {d.name}
+                          </div>
+                        ))
+                      ) : (
+                        <div
+                          className="dropdown-item"
+                          style={{ color: "#999", textAlign: "center" }}
+                        >
+                          Нет дисциплин
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";  
+import { useState, useEffect, useRef } from "react";
 
 export function ProgressPage() {
   const [openGroup, setOpenGroup] = useState(false);
@@ -24,48 +24,52 @@ export function ProgressPage() {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
         const teacherId = user?.userId;
-        const res = await fetch(`http://localhost:8081/mySchedule/${teacherId}`);
+        const res = await fetch(`${API_URL}/mySchedule/${teacherId}`);
         const data = await res.json();
 
-        const teacherData = data.filter(item =>
-          item.teacherIds.includes(teacherId)
+        const teacherData = data.filter((item) =>
+          item.teacherIds.includes(teacherId),
         );
 
         const groupToDisc = {};
         const discToGroup = {};
 
-        teacherData.forEach(item => {
+        teacherData.forEach((item) => {
           const group = item.groupName;
 
           // Берём все дисциплины одного предмета
           const disciplinesArray = [
             item.lectureName,
             item.labName,
-            item.practicName
+            item.practicName,
           ].filter(Boolean);
 
           if (!groupToDisc[group]) groupToDisc[group] = [];
 
-          disciplinesArray.forEach(name => {
+          disciplinesArray.forEach((name) => {
             // Добавляем только уникальные по имени
-            if (!groupToDisc[group].some(d => d.name === name)) {
+            if (!groupToDisc[group].some((d) => d.name === name)) {
               const id = item.lectureId || item.labId || item.practicId;
               groupToDisc[group].push({ id, name });
             }
 
             if (!discToGroup[name]) discToGroup[name] = [];
-            if (!discToGroup[name].includes(group)) discToGroup[name].push(group);
+            if (!discToGroup[name].includes(group))
+              discToGroup[name].push(group);
           });
         });
 
         // Уникальные дисциплины для всего списка
         const uniqueDisciplinesMap = new Map();
-        Object.values(groupToDisc).flat().forEach(d => {
-          if (!uniqueDisciplinesMap.has(d.name)) uniqueDisciplinesMap.set(d.name, d);
-        });
-        const uniqueDisciplines = Array.from(uniqueDisciplinesMap.values()).sort((a, b) =>
-          a.name.localeCompare(b.name)
-        );
+        Object.values(groupToDisc)
+          .flat()
+          .forEach((d) => {
+            if (!uniqueDisciplinesMap.has(d.name))
+              uniqueDisciplinesMap.set(d.name, d);
+          });
+        const uniqueDisciplines = Array.from(
+          uniqueDisciplinesMap.values(),
+        ).sort((a, b) => a.name.localeCompare(b.name));
 
         setGroups(Object.keys(groupToDisc).sort());
         setDisciplines(uniqueDisciplines);
@@ -82,7 +86,7 @@ export function ProgressPage() {
     if (!groupName) return;
     try {
       const res = await fetch(
-        `http://localhost:8081/students/${encodeURIComponent(groupName)}`
+        `${API_URL}/students/${encodeURIComponent(groupName)}`,
       );
       const data = await res.json();
       setStudents(Array.isArray(data) ? data : []);
@@ -95,12 +99,12 @@ export function ProgressPage() {
     if (!groupName || !disciplineId) return;
     try {
       const res = await fetch(
-        `http://localhost:8081/grades/${encodeURIComponent(groupName)}/${disciplineId}`
+        `${API_URL}/grades/${encodeURIComponent(groupName)}/${disciplineId}`,
       );
       const data = await res.json();
 
       const loadedGrades = {};
-      data.forEach(g => {
+      data.forEach((g) => {
         if (!loadedGrades[g.student_id]) loadedGrades[g.student_id] = {};
         loadedGrades[g.student_id][g.module_number] = g.score;
       });
@@ -114,12 +118,14 @@ export function ProgressPage() {
   }
 
   useEffect(() => {
-    const changed = students.some(s => {
+    const changed = students.some((s) => {
       const studentGrades = grades[s.id] || {};
       const initialStudentGrades = initialGrades[s.id] || {};
-      return [1, 2, 3, 4].some(m => {
+      return [1, 2, 3, 4].some((m) => {
         const current = studentGrades[m] ? parseInt(studentGrades[m]) : 0;
-        const initial = initialStudentGrades[m] ? parseInt(initialStudentGrades[m]) : 0;
+        const initial = initialStudentGrades[m]
+          ? parseInt(initialStudentGrades[m])
+          : 0;
         return current !== initial;
       });
     });
@@ -151,7 +157,10 @@ export function ProgressPage() {
     function handleClickOutside(event) {
       if (groupRef.current && !groupRef.current.contains(event.target))
         setOpenGroup(false);
-      if (disciplineRef.current && !disciplineRef.current.contains(event.target))
+      if (
+        disciplineRef.current &&
+        !disciplineRef.current.contains(event.target)
+      )
         setOpenDiscipline(false);
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -162,12 +171,12 @@ export function ProgressPage() {
     if (value.length > 3) return;
     if (value && isNaN(value)) return;
 
-    setGrades(prev => {
+    setGrades((prev) => {
       const newGrades = {
         ...prev,
-        [studentId]: { ...prev[studentId], [moduleNumber]: value }
+        [studentId]: { ...prev[studentId], [moduleNumber]: value },
       };
-      if (Object.values(newGrades[studentId]).every(v => !v))
+      if (Object.values(newGrades[studentId]).every((v) => !v))
         delete newGrades[studentId];
       setUnsavedChanges(Object.keys(newGrades).length > 0);
       return newGrades;
@@ -191,7 +200,7 @@ export function ProgressPage() {
           module_number: parseInt(moduleNumber),
           score: grades[studentId][moduleNumber]
             ? parseInt(grades[studentId][moduleNumber])
-            : null
+            : null,
         });
       }
     }
@@ -204,10 +213,10 @@ export function ProgressPage() {
     console.log("Payload to send:", payload);
 
     try {
-      await fetch(`http://localhost:8081/grades`, {
+      await fetch(`${API_URL}/grades`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       setUnsavedChanges(false);
       alert("Оценки успешно сохранены!");
@@ -230,7 +239,7 @@ export function ProgressPage() {
             {selectedGroup && (
               <span
                 className="clear-btn"
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   setSelectedGroup(null);
                   setInitialGrades({});
@@ -244,7 +253,7 @@ export function ProgressPage() {
           </div>
           {openGroup && (
             <div className="dropdown-menu">
-              {availableGroups.map(g => (
+              {availableGroups.map((g) => (
                 <div
                   key={g}
                   className="dropdown-item"
@@ -255,7 +264,7 @@ export function ProgressPage() {
                     if (
                       selectedDiscipline &&
                       !mapping.groupToDisc?.[g]?.some(
-                        d => d.name === selectedDiscipline.name
+                        (d) => d.name === selectedDiscipline.name,
                       )
                     ) {
                       setSelectedDiscipline(null);
@@ -279,7 +288,7 @@ export function ProgressPage() {
               {selectedDiscipline && (
                 <span
                   className="clear-btn"
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     setInitialGrades({});
                     setSelectedDiscipline(null);
@@ -292,7 +301,7 @@ export function ProgressPage() {
             </div>
             {openDiscipline && (
               <div className="dropdown-menu">
-                {availableDisciplines.map(d => (
+                {availableDisciplines.map((d) => (
                   <div
                     key={d.id}
                     className="dropdown-item"
@@ -303,7 +312,7 @@ export function ProgressPage() {
                       if (
                         selectedGroup &&
                         !mapping.groupToDisc?.[selectedGroup]?.some(
-                          dd => dd.name === d.name
+                          (dd) => dd.name === d.name,
                         )
                       ) {
                         setSelectedGroup(null);
@@ -324,7 +333,6 @@ export function ProgressPage() {
           )}
         </div>
       </div>
-
       {selectedGroup && selectedDiscipline && students?.length > 0 && (
         <table className="students-table">
           <thead>
@@ -345,23 +353,27 @@ export function ProgressPage() {
               .map((s, index) => {
                 const studentGrades = grades[s.id] || {};
                 const total = [1, 2, 3, 4]
-                  .map(m => parseInt(studentGrades[m]) || 0)
+                  .map((m) => parseInt(studentGrades[m]) || 0)
                   .reduce((a, b) => a + b, 0);
 
                 return (
                   <tr key={s.id}>
                     <td>{index + 1}</td>
                     <td>{s.username}</td>
-                    {[1, 2, 3, 4].map(module => (
+                    {[1, 2, 3, 4].map((module) => (
                       <td key={module}>
                         <input
                           type="text"
                           maxLength={3}
                           value={studentGrades[module] || ""}
-                          onChange={e =>
+                          onChange={(e) =>
                             handleGradeChange(s.id, module, e.target.value)
                           }
-                          style={{ width: "100% ", textAlign: "center", border: "none" }}
+                          style={{
+                            width: "100% ",
+                            textAlign: "center",
+                            border: "none",
+                          }}
                         />
                       </td>
                     ))}

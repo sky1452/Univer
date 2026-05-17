@@ -174,22 +174,22 @@ export function StudentSubmissionCard({
         <strong>Файлы:</strong>
 
         <div className="check-homework-files-wrap">
-          {allFiles.length > 0 ? (
-            allFiles.map((file, index) => (
-              <span key={`${selectedStudentData.student_id}-${file.file_index}`}>
-                <a
-                  href={`http://localhost:8081/tasks/${homeworkId}/student/${selectedStudentData.student_id}/files/${file.file_index}/download`}
-                  className="file-link check-homework-file-link"
+          {allFiles.length > 0
+            ? allFiles.map((file, index) => (
+                <span
+                  key={`${selectedStudentData.student_id}-${file.file_index}`}
                 >
-                  <FileText size={18} />
-                  {file.file_name}
-                </a>
-                {index !== allFiles.length - 1 && ", "}
-              </span>
-            ))
-          ) : (
-            "-"
-          )}
+                  <a
+                    href={`${API_URL}/tasks/${homeworkId}/student/${selectedStudentData.student_id}/files/${file.file_index}/download`}
+                    className="file-link check-homework-file-link"
+                  >
+                    <FileText size={18} />
+                    {file.file_name}
+                  </a>
+                  {index !== allFiles.length - 1 && ", "}
+                </span>
+              ))
+            : "-"}
         </div>
       </div>
     </div>

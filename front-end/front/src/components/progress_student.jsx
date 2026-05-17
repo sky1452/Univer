@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export function ProgressPage_student() {
-  const [data, setData] = useState([]); 
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -14,26 +14,27 @@ export function ProgressPage_student() {
         const user = JSON.parse(localStorage.getItem("user"));
         const studentId = user?.userId;
 
-        const scheduleRes = await fetch(`http://localhost:8081/mySchedule/${studentId}`, {
+        const scheduleRes = await fetch(`${API_URL}/mySchedule/${studentId}`, {
           headers: { "Content-Type": "application/json" },
           mode: "cors",
         });
         const scheduleRaw = await scheduleRes.json();
 
-        const gradesRes = await fetch(`http://localhost:8081/studentGrades/${studentId}`, {
+        const gradesRes = await fetch(`${API_URL}/studentGrades/${studentId}`, {
           headers: { "Content-Type": "application/json" },
           mode: "cors",
         });
         const gradesRaw = await gradesRes.json();
 
         const gradesMap = {};
-        (Array.isArray(gradesRaw) ? gradesRaw : []).forEach(g => {
+        (Array.isArray(gradesRaw) ? gradesRaw : []).forEach((g) => {
           gradesMap[g.discipline_type] = g.modules ?? {};
         });
 
         const mergedMap = {};
-        (Array.isArray(scheduleRaw) ? scheduleRaw : []).forEach(s => {
-          const name = s.lectureName ?? s.labName ?? s.practicName ?? `Дисциплина ${s.id}`;
+        (Array.isArray(scheduleRaw) ? scheduleRaw : []).forEach((s) => {
+          const name =
+            s.lectureName ?? s.labName ?? s.practicName ?? `Дисциплина ${s.id}`;
           if (!mergedMap[name]) {
             const modules = gradesMap[name] ?? {};
             mergedMap[name] = {
@@ -49,25 +50,28 @@ export function ProgressPage_student() {
           }
         });
 
-         const sortedData = Object.values(mergedMap).sort((a, b) =>
-          a.disciplineName.localeCompare(b.disciplineName, "ru")
+        const sortedData = Object.values(mergedMap).sort((a, b) =>
+          a.disciplineName.localeCompare(b.disciplineName, "ru"),
         );
 
         // === ДОБАВЛЕННЫЙ КОД ===
         // Изменяем нужные строки (нумерация с 1)
-        if (sortedData[5]) { // 7-я строка
+        if (sortedData[5]) {
+          // 7-я строка
           sortedData[5].modules[1] = 30;
           sortedData[5].modules[2] = 30;
           sortedData[5].modules[3] = 40;
         }
 
-        if (sortedData[7]) { // 9-я строка
+        if (sortedData[7]) {
+          // 9-я строка
           sortedData[7].modules[1] = 20;
           sortedData[7].modules[2] = 20;
           sortedData[7].modules[3] = 20;
         }
 
-        if (sortedData[8]) { // 10-я строка
+        if (sortedData[8]) {
+          // 10-я строка
           sortedData[8].modules[1] = 0;
           sortedData[8].modules[2] = 0;
           sortedData[8].modules[3] = 91;
@@ -87,11 +91,16 @@ export function ProgressPage_student() {
   }, []);
 
   if (loading) return <div className="progress_s">Загрузка...</div>;
-  if (error) return <div className="progress_s" style={{ color: "red" }}>Ошибка: {error}</div>;
+  if (error)
+    return (
+      <div className="progress_s" style={{ color: "red" }}>
+        Ошибка: {error}
+      </div>
+    );
 
   return (
     <div className="progress_s">
-      <div style={{ textAlign: 'left', fontSize: '20px' }}>Успеваемость:</div>
+      <div style={{ textAlign: "left", fontSize: "20px" }}>Успеваемость:</div>
       {data.length === 0 ? (
         <div>По вашему аккаунту данных не найдено.</div>
       ) : (
@@ -110,12 +119,12 @@ export function ProgressPage_student() {
             </thead>
             <tbody>
               {data.map((item, index) => {
-                const total = [1,2,3,4].reduce((sum,m) => {
+                const total = [1, 2, 3, 4].reduce((sum, m) => {
                   const v = Number(item.modules[m]);
                   return sum + (Number.isFinite(v) ? v : 0);
                 }, 0);
 
-                const display = m => item.modules[m] ?? "-";
+                const display = (m) => item.modules[m] ?? "-";
 
                 return (
                   <tr key={item.disciplineId}>
@@ -125,7 +134,9 @@ export function ProgressPage_student() {
                     <td style={{ textAlign: "center" }}>{display(2)}</td>
                     <td style={{ textAlign: "center" }}>{display(3)}</td>
                     <td style={{ textAlign: "center" }}>{display(4)}</td>
-                    <td style={{ textAlign: "center" }}>{total > 0 ? total : "-"}</td>
+                    <td style={{ textAlign: "center" }}>
+                      {total > 0 ? total : "-"}
+                    </td>
                   </tr>
                 );
               })}
@@ -133,7 +144,8 @@ export function ProgressPage_student() {
           </table>
 
           <div style={{ marginTop: "20px", textAlign: "left" }}>
-            <b>*Итого</b> – общее количество баллов за текущий семестр по дисциплине.
+            <b>*Итого</b> – общее количество баллов за текущий семестр по
+            дисциплине.
           </div>
 
           <table className="students-table2" style={{ marginTop: "10px" }}>

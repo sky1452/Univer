@@ -19,7 +19,7 @@ export function SchedulePage_student() {
   useEffect(() => {
     if (!userId) return;
 
-    fetch(`http://localhost:8081/mySchedule/${userId}`)
+    fetch(`${API_URL}/mySchedule/${userId}`)
       .then((res) => res.json())
       .then((data) => {
         setSchedule(data);

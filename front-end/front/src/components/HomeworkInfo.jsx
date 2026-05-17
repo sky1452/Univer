@@ -1,3 +1,4 @@
+import { API_URL } from "../config";
 import { FileText } from "lucide-react";
 
 export function HomeworkInfo({
@@ -11,8 +12,7 @@ export function HomeworkInfo({
   createAnswer,
   onCreateAnswer,
 }) {
-  const hasScore =
-    scoreData?.score !== null && scoreData?.score !== undefined;
+  const hasScore = scoreData?.score !== null && scoreData?.score !== undefined;
 
   return (
     <div className="my-homework1">
@@ -54,11 +54,15 @@ export function HomeworkInfo({
             {submissionData.files.map((file, index) => (
               <span
                 key={index}
-                style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
               >
                 <a
                   className="file-link"
-                  href={`http://localhost:8081/tasks/${taskId}/student/${userId}/files/${index}/download`}
+                  href={`${API_URL}/tasks/${taskId}/student/${userId}/files/${index}/download`}
                 >
                   <FileText size={18} />
                   {file.file_name}
@@ -85,8 +89,8 @@ export function HomeworkInfo({
         {scoreLoading
           ? "Загрузка..."
           : scoreData?.score !== null && scoreData?.score !== undefined
-          ? `${scoreData.score} / ${task.max_score}`
-          : "-"}
+            ? `${scoreData.score} / ${task.max_score}`
+            : "-"}
       </div>
 
       {!hasScore && !createAnswer && (

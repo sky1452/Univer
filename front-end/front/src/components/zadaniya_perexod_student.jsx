@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchDiscipline, fetchStudentTasks, fetchProgress } from "./api";
-import { DateTime } from 'luxon';
+import { DateTime } from "luxon";
 
 export function HomeworkStudentPage_id() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -40,7 +40,7 @@ export function HomeworkStudentPage_id() {
       console.log("Raw Deadline:", t.deadline);
 
       // Используем fromISO для корректного парсинга строки в ISO-формате
-      const deadline = DateTime.fromISO(t.deadline); 
+      const deadline = DateTime.fromISO(t.deadline);
 
       if (!deadline.isValid) {
         console.error(`Invalid deadline for task: ${t.title}`, t.deadline);
@@ -58,9 +58,10 @@ export function HomeworkStudentPage_id() {
   console.log("Filtered Future Deadlines:", futureDeadlines);
 
   // Определяем ближайший дедлайн, если есть
-  const nearestDeadline = futureDeadlines.length > 0
-    ? futureDeadlines.reduce((a, b) => (a < b ? a : b)) // Находим ближайший дедлайн
-    : null;
+  const nearestDeadline =
+    futureDeadlines.length > 0
+      ? futureDeadlines.reduce((a, b) => (a < b ? a : b)) // Находим ближайший дедлайн
+      : null;
 
   // Логируем ближайший дедлайн
   console.log("Nearest Deadline:", nearestDeadline);
@@ -71,9 +72,7 @@ export function HomeworkStudentPage_id() {
 
   return (
     <div className="zadaniya_main">
-      <div style={{ textAlign: "center" }}>
-        Мои задания
-      </div>
+      <div style={{ textAlign: "center" }}>Мои задания</div>
 
       <div className="course-header">
         Название курса: {disciplineData?.name}
@@ -85,7 +84,8 @@ export function HomeworkStudentPage_id() {
           : "Задания отсутствуют"}
       </div>
       <div className="course-header">
-        Прогресс: {progress?.progress || 0}/{tasks && tasks.length > 0 ? tasks.length : "Задания отсутствуют"}
+        Прогресс: {progress?.progress || 0}/
+        {tasks && tasks.length > 0 ? tasks.length : "Задания отсутствуют"}
       </div>
       <div className="zadaniyes">
         Задания данного курса:
@@ -96,14 +96,18 @@ export function HomeworkStudentPage_id() {
                 className="zadaniye"
                 key={t.id}
                 onClick={() =>
-                  navigate(`/homework_student/${disciplineId}/${disciplineSlug}/${t.id}`)
+                  navigate(
+                    `/homework_student/${disciplineId}/${disciplineSlug}/${t.id}`,
+                  )
                 }
               >
                 {t.title}
               </div>
             ))
           ) : (
-            <div>У вас пока нет созданных заданий в этой дисциплине и группе.</div>
+            <div>
+              У вас пока нет созданных заданий в этой дисциплине и группе.
+            </div>
           )}
         </div>
       </div>
@@ -137,7 +141,7 @@ useEffect(() => {
     return;
   }
 
-  fetch(`http://localhost:8081/discipline/${disciplineId}`)
+  fetch(`${API_URL}/discipline/${disciplineId}`)
     .then(res => res.json())
     .then(data => {
       setDiscipline(data.name);
@@ -158,7 +162,7 @@ useEffect(() => {
     return;
   }
 
-  fetch(`http://localhost:8081/discipline/${disciplineId}/student/${userId}`)
+  fetch(`${API_URL}/discipline/${disciplineId}/student/${userId}`)
     .then(res => res.json())
     .then(data => {
       if (data.error) {

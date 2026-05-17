@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 
 export function Datap() {
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")) || {});
+  const [user, setUser] = useState(
+    () => JSON.parse(localStorage.getItem("user")) || {},
+  );
   const [experience, setExperience] = useState("");
   const [dop, setDop] = useState("");
   const [avatar, setAvatar] = useState(user.avatar || "");
@@ -17,12 +19,12 @@ export function Datap() {
     if (!user?.userId) return;
     const fetchDisciplines = async () => {
       try {
-        const res = await fetch(`http://localhost:8081/mySchedule/${user.userId}`);
+        const res = await fetch(`${API_URL}/mySchedule/${user.userId}`);
         if (res.ok) {
           const data = await res.json();
 
           const mapped = data
-            .map(d => {
+            .map((d) => {
               let id, name, type;
               if (d.lectureId) {
                 id = d.lectureId;
@@ -39,10 +41,10 @@ export function Datap() {
               }
               return { id, name, type };
             })
-            .filter(d => d.name);
+            .filter((d) => d.name);
 
           const uniqueDisciplines = Array.from(
-            new Map(mapped.map(d => [d.name + d.type, d])).values()
+            new Map(mapped.map((d) => [d.name + d.type, d])).values(),
           );
 
           uniqueDisciplines.sort((a, b) => a.name.localeCompare(b.name));
@@ -69,10 +71,13 @@ export function Datap() {
 
   const handleSaveStazh = async () => {
     try {
-      const response = await fetch(`http://localhost:8081/api/update-user`, {
+      const response = await fetch(`${API_URL}/api/update-user`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: user.fullName, stazh: Number(experience) }),
+        body: JSON.stringify({
+          name: user.fullName,
+          stazh: Number(experience),
+        }),
       });
       if (response.ok) {
         const updatedUser = { ...user, stazh: Number(experience) };
@@ -99,7 +104,7 @@ export function Datap() {
 
   const handleSavedop = async () => {
     try {
-      const response = await fetch(`http://localhost:8081/api/update-dop`, {
+      const response = await fetch(`${API_URL}/api/update-dop`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: user.fullName, dop }),
@@ -131,7 +136,7 @@ export function Datap() {
     reader.onloadend = async () => {
       const base64 = reader.result.split(",")[1];
       try {
-        const response = await fetch("http://localhost:8081/api/update-avatar", {
+        const response = await fetch("${API_URL}/api/update-avatar", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: user.fullName, avatar: base64 }),
@@ -155,7 +160,10 @@ export function Datap() {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (disciplineRef.current && !disciplineRef.current.contains(event.target)) {
+      if (
+        disciplineRef.current &&
+        !disciplineRef.current.contains(event.target)
+      ) {
         setOpenDiscipline(false);
       }
     }
@@ -181,7 +189,11 @@ export function Datap() {
               {user.email}
             </td>
             <td align="center">
-              <img src={avatar} alt="" style={{ maxWidth: "256px", maxHeight: "256px" }} />
+              <img
+                src={avatar}
+                alt=""
+                style={{ maxWidth: "256px", maxHeight: "256px" }}
+              />
             </td>
           </tr>
           <tr>
@@ -202,7 +214,10 @@ export function Datap() {
                   Дисциплины
                 </div>
                 {openDiscipline && (
-                  <div className="dropdown-menu" style={{ textAlign: "center" }}>
+                  <div
+                    className="dropdown-menu"
+                    style={{ textAlign: "center" }}
+                  >
                     {disciplines.length > 0 ? (
                       disciplines.map((d) => (
                         <div key={d.id} className="dropdown-item">
@@ -221,39 +236,36 @@ export function Datap() {
           </tr>
 
           {/* --- СТАЖ --- */}
-        <tr>
-  <td>Стаж работы:</td>
-  <td>
-    <div className="experience-box">
-      <input
-        type="text"
-        inputMode="numeric"
-        className="experience-input"
-        value={experience}
-        onChange={(e) => {
-          const val = e.target.value;
-          if (val === "" || (/^\d{1,2}$/.test(val) && Number(val) >= 0)) {
-            setExperience(val);
-            setIsExperienceChanged(Number(val) !== user.stazh);
-          }
-        }}
-      />
-      <span className="experience-word">
-        {experience !== "" ? getYearWord(Number(experience)) : ""}
-      </span>
-
-      {isExperienceChanged && (
-        <button
-          className="button_save"
-          onClick={handleSaveStazh}
-          style={{ marginLeft: "10px", marginTop: "0" }}
-        >
-          Сохранить
-        </button>
-      )}
-    </div>
-  </td>
-</tr>
+          <tr>
+            <td>Стаж работы:</td>
+            <td>
+              <input
+                type="number"
+                style={{ width: "10%" }}
+                value={experience}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (
+                    val === "" ||
+                    (/^\d{1,2}$/.test(val) && Number(val) >= 0)
+                  ) {
+                    setExperience(val);
+                    setIsExperienceChanged(Number(val) !== user.stazh);
+                  }
+                }}
+              />{" "}
+              {experience !== "" ? getYearWord(Number(experience)) : ""}
+              {isExperienceChanged && (
+                <button
+                  className="button_save"
+                  onClick={handleSaveStazh}
+                  style={{ marginLeft: "10px" }}
+                >
+                  Сохранить
+                </button>
+              )}
+            </td>
+          </tr>
 
           {/* --- ДОП. ИНФО --- */}
           <tr>

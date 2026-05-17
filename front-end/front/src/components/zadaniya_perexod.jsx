@@ -19,7 +19,7 @@ export function HomeworkPage_id() {
   const [discipline, setDiscipline] = useState(null);
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(
-    group ? decodeURIComponent(group) : null
+    group ? decodeURIComponent(group) : null,
   );
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export function HomeworkPage_id() {
       return;
     }
 
-    fetch(`http://localhost:8081/discipline/${disciplineId}`)
+    fetch(`${API_URL}/discipline/${disciplineId}`)
       .then((res) => res.json())
       .then((data) => {
         setDiscipline(data.name);
@@ -47,15 +47,19 @@ export function HomeworkPage_id() {
       return;
     }
 
-    fetch(`http://localhost:8081/mySchedule/${userId}`)
+    fetch(`${API_URL}/mySchedule/${userId}`)
       .then((res) => res.json())
       .then((data) => {
         const filtered = data.filter(
-          (item) => item.disciplineId === parseInt(disciplineId)
+          (item) => item.disciplineId === parseInt(disciplineId),
         );
 
-        const uniqueGroups = [...new Set(filtered.map((item) => item.groupName))];
-        const sortedGroups = uniqueGroups.sort((a, b) => a.localeCompare(b, "ru"));
+        const uniqueGroups = [
+          ...new Set(filtered.map((item) => item.groupName)),
+        ];
+        const sortedGroups = uniqueGroups.sort((a, b) =>
+          a.localeCompare(b, "ru"),
+        );
 
         setGroups(sortedGroups);
       })

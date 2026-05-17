@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export function Homework_studentPage(){
+export function Homework_studentPage() {
   const navigate = useNavigate();
 
   const [discipline, setDiscipline] = useState([]);
@@ -19,27 +19,24 @@ export function Homework_studentPage(){
       return;
     }
 
-    fetch(`http://localhost:8081/mySchedule/${userId}`)
-      .then(res => res.json())
+    fetch(`${API_URL}/mySchedule/${userId}`)
+      .then((res) => res.json())
       .then((data) => {
-
         const IdSlugName = new Map();
 
-        data.forEach(item => {
+        data.forEach((item) => {
           if (!IdSlugName.has(item.disciplineId)) {
             IdSlugName.set(item.disciplineId, {
               id: item.disciplineId,
               slug: item.disciplineSlug,
-              name:
-                item.labName ||
-                item.practicName ||
-                item.lectureName
+              name: item.labName || item.practicName || item.lectureName,
             });
           }
         });
 
-        const ISN = Array.from(IdSlugName.values())
-          .sort((a, b) => a.name.localeCompare(b.name, "ru"));
+        const ISN = Array.from(IdSlugName.values()).sort((a, b) =>
+          a.name.localeCompare(b.name, "ru"),
+        );
 
         setDiscipline(ISN);
         setLoading(false);
@@ -48,7 +45,6 @@ export function Homework_studentPage(){
         console.error("Ошибка при загрузке дисциплин:", error);
         setLoading(false);
       });
-
   }, [userId]);
 
   // загрузка недавно посещённых (с учётом userId)
@@ -67,10 +63,10 @@ export function Homework_studentPage(){
   if (loading) return <p>Загрузка дисципилин...</p>;
 
   return (
-    <div className="progresst">Мои задания
-    
+    <div className="progresst">
+      Мои задания
       <div>
-        <div style={{ textAlign: 'left', fontSize: '20px', marginTop: '4%' }}>
+        <div style={{ textAlign: "left", fontSize: "20px", marginTop: "4%" }}>
           Ваши недавно посещённые курсы:
         </div>
 
@@ -79,43 +75,42 @@ export function Homework_studentPage(){
             <tr></tr>
           </thead>
           <tbody>
-
             <tr>
-              {[...recentCourses, ...Array(4 - recentCourses.length)].map((course, i) => (
-                <td key={i}>
-                  {course ? (
-                    <div
-                      className="square"
-                      onClick={() =>
-                        navigate(`/homework_student/${course.id}/${course.slug}`)
-                      }
-                    >
-                      
-                    </div>
-                  ) : (
-                    <div className="square"></div>
-                  )}
-                </td>
-              ))}
+              {[...recentCourses, ...Array(4 - recentCourses.length)].map(
+                (course, i) => (
+                  <td key={i}>
+                    {course ? (
+                      <div
+                        className="square"
+                        onClick={() =>
+                          navigate(
+                            `/homework_student/${course.id}/${course.slug}`,
+                          )
+                        }
+                      ></div>
+                    ) : (
+                      <div className="square"></div>
+                    )}
+                  </td>
+                ),
+              )}
             </tr>
 
             <tr>
-              {[...recentCourses, ...Array(4 - recentCourses.length)].map((course, i) => (
-                <td key={i}>
-                  {course ? course.name : ""}
-                </td>
-              ))}
+              {[...recentCourses, ...Array(4 - recentCourses.length)].map(
+                (course, i) => (
+                  <td key={i}>{course ? course.name : ""}</td>
+                ),
+              )}
             </tr>
-
           </tbody>
         </table>
       </div>
-
       {discipline.length === 0 ? (
         <p>Нет дисциплин для отображения</p>
       ) : (
         <div
-          style={{ textAlign: 'left', fontSize: '20px', marginTop: '4%' }}
+          style={{ textAlign: "left", fontSize: "20px", marginTop: "4%" }}
           className="courses"
         >
           Выберите курс:
@@ -125,7 +120,8 @@ export function Homework_studentPage(){
               className="course-item"
               onClick={() => {
                 const storageKey = `recentCourses_${userId}`;
-                const recent = JSON.parse(localStorage.getItem(storageKey)) || [];
+                const recent =
+                  JSON.parse(localStorage.getItem(storageKey)) || [];
 
                 const newCourse = {
                   id: coures.id,
@@ -133,7 +129,7 @@ export function Homework_studentPage(){
                   name: coures.name,
                 };
 
-                const filtered = recent.filter(c => c.id !== newCourse.id);
+                const filtered = recent.filter((c) => c.id !== newCourse.id);
                 const updated = [newCourse, ...filtered].slice(0, 4);
 
                 localStorage.setItem(storageKey, JSON.stringify(updated));

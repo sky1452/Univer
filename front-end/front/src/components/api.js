@@ -1,23 +1,24 @@
+import { API_URL } from "../config";
 export const fetchDiscipline = async (disciplineId) => {
-  const res = await fetch(`http://localhost:8081/discipline/${disciplineId}`);
+  const res = await fetch(`${API_URL}/discipline/${disciplineId}`);
   return res.json();
 };
 
 export const fetchStudentTasks = async (disciplineId, userId) => {
   const res = await fetch(
-    `http://localhost:8081/discipline/${disciplineId}/student/${userId}`
+    `${API_URL}/discipline/${disciplineId}/student/${userId}`
   );
   return res.json();
 };
 export const fetchProgress = async (userId, disciplineId) => {
   const res = await fetch(
-    `http://localhost:8081/progress/${userId}/${disciplineId}`
+    `${API_URL}/progress/${userId}/${disciplineId}`
   );
   return res.json();
 };
 
 export const fetchTaskById = async (taskId) => {
-  const res = await fetch(`http://localhost:8081/tasks/${taskId}`);
+  const res = await fetch(`${API_URL}/tasks/${taskId}`);
   return res.json();
 };
 export async function submitHomework(taskId, comment, files, userId, disciplineId) {
@@ -32,26 +33,26 @@ export async function submitHomework(taskId, comment, files, userId, disciplineI
     formData.append("files", file);
   });
 
-  return fetch("http://localhost:8081/submissions", {
+  return fetch("${API_URL}/submissions", {
     method: "POST",
     body: formData,
   });
 }
 export const fetchFileById = async (taskId, userId) => {
-  const res = await fetch(`http://localhost:8081/tasks/${taskId}/student/${userId}/files`);
+  const res = await fetch(`${API_URL}/tasks/${taskId}/student/${userId}/files`);
   return res.json();
 };
 
 export const fetchHomeworks = async (userId, group, disciplineId) => {
   const res = await fetch(
-    `http://localhost:8081/getHomeworks/${userId}/${group}/${disciplineId}`
+    `${API_URL}/getHomeworks/${userId}/${group}/${disciplineId}`
   );
 
   return res.json();
 };
 export async function fetchHomeworkById(userId, group, disciplineId, homeworkId) {
   const response = await fetch(
-    `http://localhost:8081/getHomework/${userId}/${encodeURIComponent(group)}/${disciplineId}/${homeworkId}`
+    `${API_URL}/getHomework/${userId}/${encodeURIComponent(group)}/${disciplineId}/${homeworkId}`
   );
 
   if (!response.ok) {
@@ -62,7 +63,7 @@ export async function fetchHomeworkById(userId, group, disciplineId, homeworkId)
 }
 export async function fetchHomeworkSubmissions(taskId, group) {
   const res = await fetch(
-    `http://localhost:8081/homeworks/${taskId}/group/${encodeURIComponent(group)}/submissions`
+    `${API_URL}/homeworks/${taskId}/group/${encodeURIComponent(group)}/submissions`
   );
 
   if (!res.ok) {
@@ -73,7 +74,7 @@ export async function fetchHomeworkSubmissions(taskId, group) {
 }
 export async function updateSubmissionScore(submissionId, score) {
   const res = await fetch(
-    `http://localhost:8081/submissions/${submissionId}/score`,
+    `${API_URL}/submissions/${submissionId}/score`,
     {
       method: "PUT",
       headers: {
@@ -93,7 +94,7 @@ export async function updateSubmissionScore(submissionId, score) {
 }
 export async function fetchSubmissionScore(taskId, userId) {
   const res = await fetch(
-    `http://localhost:8081/tasks/${taskId}/student/${userId}/score`
+    `${API_URL}/tasks/${taskId}/student/${userId}/score`
   );
 
   if (!res.ok) {
@@ -121,7 +122,7 @@ export async function updateHomeworkAnswer({
   });
 
   const res = await fetch(
-    `http://localhost:8081/tasks/${taskId}/student/${userId}/submission`,
+    `${API_URL}/tasks/${taskId}/student/${userId}/submission`,
     {
       method: "PUT",
       body: formData,
@@ -138,7 +139,7 @@ export async function updateHomeworkAnswer({
 // api.js
 export async function getHomeworks({ disciplineId, group, teacherId }) {
   const response = await fetch(
-    `http://localhost:8081/getHomeworks?disciplineId=${disciplineId}&group=${group}&teacherId=${teacherId}`
+    `${API_URL}/getHomeworks?disciplineId=${disciplineId}&group=${group}&teacherId=${teacherId}`
   );
 
   if (!response.ok) {
@@ -162,7 +163,7 @@ export async function getHomeworks({ disciplineId, group, teacherId }) {
 }
 export async function deleteHomework({ homeworkId, teacherId }) {
   const response = await fetch(
-    `http://localhost:8081/homeworks/${homeworkId}/teacher/${teacherId}`,
+    `${API_URL}/homeworks/${homeworkId}/teacher/${teacherId}`,
     {
       method: "DELETE",
     }
@@ -198,7 +199,7 @@ export async function updateHomework({
   console.log("REQUEST BODY", JSON.stringify(payload));
 
   const response = await fetch(
-    `http://localhost:8081/homeworks/${homeworkId}/teacher/${teacherId}`,
+    `${API_URL}/homeworks/${homeworkId}/teacher/${teacherId}`,
     {
       method: "PUT",
       headers: {
