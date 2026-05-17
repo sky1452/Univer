@@ -4,26 +4,21 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+
+	_ "univer/docs"
 	"univer/internal/config"
 	"univer/internal/handlers"
 	"univer/pkg/db"
-    "os"
-	_ "univer/docs"
 
-	"github.com/gorilla/mux"
-	httpSwagger "github.com/swaggo/http-swagger"
-
-	"github.com/joho/godotenv"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
-
-// @title Univer
-// @version 1.0
-// @description Приложение для автоматизации учебных процессов
-// @host localhost:8081
 
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -42,15 +37,18 @@ func corsMiddleware(next http.Handler) http.Handler {
 
 func main() {
 	fmt.Println("Server started")
-	
-	err := godotenv.Load("../.env")
 
-if err != nil {
-	log.Println("Warning: .env file not found")
-}
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Println("Warning: .env file not found")
+	}
+
 	cfg, err := config.LoadConfig("../internal/config/config.yaml")
 	if err != nil {
 		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
+	}
+
+	if databaseURL := os.Getenv("DATABASE_URL"); databaseURL != "" {
+		cfg.Database.DSN = databaseURL
 	}
 
 	conn, err := db.ConnectDB(cfg.Database.DSN)
@@ -64,16 +62,15 @@ if err != nil {
 		Endpoint:         aws.String("https://storage.yandexcloud.net"),
 		S3ForcePathStyle: aws.Bool(true),
 		Credentials: credentials.NewStaticCredentials(
-   		 os.Getenv("YANDEX_ACCESS_KEY"),
-   		 os.Getenv("YANDEX_SECRET_KEY"),
-   			 "",
-			),
+			os.Getenv("YANDEX_ACCESS_KEY"),
+			os.Getenv("YANDEX_SECRET_KEY"),
+			"",
+		),
 	}))
 
 	s3Client := s3.New(sess)
 
 	router := mux.NewRouter()
-
 	h := handlers.NewHandler(conn.Pool, cfg, s3Client)
 
 	router.Use(corsMiddleware)
@@ -128,7 +125,12 @@ if err != nil {
 	router.HandleFunc("/homeworks/{homeworkId}/teacher/{teacherId}", h.DeleteHomework).Methods("DELETE")
 	router.HandleFunc("/homeworks/{homeworkId}/teacher/{teacherId}", h.UpdateHomework).Methods("PUT")
 
-	addr := fmt.Sprintf(":%d", cfg.Server.Port)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = fmt.Sprintf("%d", cfg.Server.Port)
+	}
+
+	addr := ":" + port
 	log.Println("Сервер запущен на", addr)
 	log.Fatal(http.ListenAndServe(addr, router))
 }
