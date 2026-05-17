@@ -15,7 +15,7 @@ export function HomeworkPage_id() {
 
   const { disciplineId, group, homeworkId } = useParams();
   const navigate = useNavigate();
-
+  const disciplineSlug = useParams().disciplineSlug;
   const [discipline, setDiscipline] = useState(null);
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(
@@ -78,14 +78,14 @@ export function HomeworkPage_id() {
     setSelectedGroup(groupName);
     setMode(null);
 
-    navigate(`/homework_teacher/${disciplineId}/${discipline}`);
+    navigate(`/homework_teacher/${disciplineId}/${disciplineSlug}`);
   };
 
   if (loading) return <p>Загрузка страницы дисциплины...</p>;
 
   return (
     <div className="progresst">
-      <div style={{ textAlign: "center" }}>Проверка заданий</div>
+      <div style={{ textAlign: "center" }}>Управление работами</div>
 
       <div className="course-header">Название курса: {discipline}</div>
 

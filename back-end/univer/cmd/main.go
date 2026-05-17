@@ -7,7 +7,7 @@ import (
 	"univer/internal/config"
 	"univer/internal/handlers"
 	"univer/pkg/db"
-
+    "os"
 	_ "univer/docs"
 
 	"github.com/gorilla/mux"
@@ -42,7 +42,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 func main() {
 	fmt.Println("Server started")
 
-	cfg, err := config.LoadConfig("C:/Users/юрий/Desktop/my project/back-end/univer/internal/config/config.yaml")
+	cfg, err := config.LoadConfig("internal/config/config.yaml")
 	if err != nil {
 		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
@@ -58,10 +58,10 @@ func main() {
 		Endpoint:         aws.String("https://storage.yandexcloud.net"),
 		S3ForcePathStyle: aws.Bool(true),
 		Credentials: credentials.NewStaticCredentials(
-			"YCAJE25LnH-jAwtkZ4pWouxZs",
-			"YCNK5wafOwQ7tZnNq7PVn8FwxkxOxvCTP0WpFqoV",
-			"",
-		),
+   		 os.Getenv("YANDEX_ACCESS_KEY"),
+   		 os.Getenv("YANDEX_SECRET_KEY"),
+   			 "",
+			),
 	}))
 
 	s3Client := s3.New(sess)

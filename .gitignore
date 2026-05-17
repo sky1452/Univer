@@ -1,0 +1,21 @@
+# env
+.env
+.env.local
+
+# node
+node_modules/
+dist/
+build/
+
+# go
+*.exe
+*.out
+bin/
+
+# ide
+.idea/
+.vscode/
+
+# os
+.DS_Store
+Thumbs.db

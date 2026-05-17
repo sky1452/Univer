@@ -221,34 +221,39 @@ export function Datap() {
           </tr>
 
           {/* --- СТАЖ --- */}
-          <tr>
-            <td>Стаж работы:</td>
-            <td>
-              <input
-                type="number"
-                style={{ width: "10%" }}
-                value={experience}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "" || (/^\d{1,2}$/.test(val) && Number(val) >= 0)) {
-                    setExperience(val);
-                    setIsExperienceChanged(Number(val) !== user.stazh);
-                  }
-                }}
-              />{" "}
-              {experience !== "" ? getYearWord(Number(experience)) : ""}
-              {isExperienceChanged && (
-                <button
-                  className="button_save"
-                  
-                  onClick={handleSaveStazh}
-                  style={{ marginLeft: "10px" }}
-                >
-                  Сохранить
-                </button>
-              )}
-            </td>
-          </tr>
+        <tr>
+  <td>Стаж работы:</td>
+  <td>
+    <div className="experience-box">
+      <input
+        type="text"
+        inputMode="numeric"
+        className="experience-input"
+        value={experience}
+        onChange={(e) => {
+          const val = e.target.value;
+          if (val === "" || (/^\d{1,2}$/.test(val) && Number(val) >= 0)) {
+            setExperience(val);
+            setIsExperienceChanged(Number(val) !== user.stazh);
+          }
+        }}
+      />
+      <span className="experience-word">
+        {experience !== "" ? getYearWord(Number(experience)) : ""}
+      </span>
+
+      {isExperienceChanged && (
+        <button
+          className="button_save"
+          onClick={handleSaveStazh}
+          style={{ marginLeft: "10px", marginTop: "0" }}
+        >
+          Сохранить
+        </button>
+      )}
+    </div>
+  </td>
+</tr>
 
           {/* --- ДОП. ИНФО --- */}
           <tr>

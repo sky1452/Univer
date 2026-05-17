@@ -72,31 +72,33 @@ export function CreatedHomework({ disciplineId, group, userId }) {
           </thead>
 
           <tbody>
-            {homeworks.map((hw) => (
-              <tr key={hw.id}>
-                <td>{hw.title}</td>
-                <td>{hw.description}</td>
-                <td>{hw.max_score}</td>
-                <td>{hw.created_at}</td>
-                <td>{hw.updated_at}</td>
-                <td>{hw.deadline}</td>
-                <td>
-                  <div className="actions">
-                    <Pencil
-                      size={18}
-                      onClick={() => setEditingHomework(hw)}
-                      className="edit"
-                    />
-                    <Trash2
-                      size={18}
-                      onClick={() => handleDeleteHomework(hw.id)}
-                      className="delete"
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+  {[...homeworks]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // новые сверху
+    .map((hw) => (
+      <tr key={hw.id}>
+        <td>{hw.title}</td>
+        <td>{hw.description}</td>
+        <td>{hw.max_score}</td>
+        <td>{hw.created_at}</td>
+        <td>{hw.updated_at}</td>
+        <td>{hw.deadline}</td>
+        <td>
+          <div className="actions">
+            <Pencil
+              size={18}
+              onClick={() => setEditingHomework(hw)}
+              className="edit"
+            />
+            <Trash2
+              size={18}
+              onClick={() => handleDeleteHomework(hw.id)}
+              className="delete"
+            />
+          </div>
+        </td>
+      </tr>
+    ))}
+</tbody>
         </table>
       )}
 

@@ -107,3 +107,28 @@
   color: white;
   border: 1px solid transparent;
 }
+.experience-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.experience-input {
+  width: 24px !important;
+  min-width: 24px;
+  max-width: 24px;
+  padding: 0 !important;
+  margin: 0;
+  border: none !important;
+  outline: none;
+  background: transparent;
+  font-size: 20px;
+  font-family: Arial;
+  text-align: center;
+  border-radius: 0 !important;
+  box-shadow: none;
+}
+
+.experience-word {
+  white-space: nowrap;
+}

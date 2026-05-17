@@ -104,3 +104,31 @@ input:focus {
   color: red;
   text-align: center;
 }
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  width: 100%;
+  padding-right: 40px; 
+  box-sizing: border-box;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #666;
+}
+
+.password-toggle:hover {
+  color: #000;
+}

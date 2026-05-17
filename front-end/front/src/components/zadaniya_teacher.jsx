@@ -66,7 +66,7 @@ export function HomeworkPage() {
   if (loading) return <p>Загрузка дисциплин...</p>;
 
   return (
-    <div className="progresst">Проверка заданий
+    <div className="progresst">Управление работами
 
       <div>
         <div style={{ textAlign: 'left', fontSize: '20px', marginTop: '4%' }}>
