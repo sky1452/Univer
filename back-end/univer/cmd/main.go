@@ -24,12 +24,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 
-		allowedOrigins := map[string]bool{
-			"http://localhost:3000":                       true,
-			"https://my-project-beryl-zeta-71.vercel.app": true,
-		}
-
-		if allowedOrigins[origin] {
+		if origin != "" {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		}
 
