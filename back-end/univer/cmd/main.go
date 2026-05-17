@@ -38,11 +38,11 @@ func corsMiddleware(next http.Handler) http.Handler {
 func main() {
 	fmt.Println("Server started")
 
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		log.Println("Warning: .env file not found")
 	}
 
-	cfg, err := config.LoadConfig("../internal/config/config.yaml")
+	cfg, err := config.LoadConfig("internal/config/config.yaml")
 	if err != nil {
 		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
