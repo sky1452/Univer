@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { fetchDiscipline, fetchStudentTasks, fetchProgress } from "./api";
 import { DateTime } from "luxon";
 
-export function HomeworkStudentPage_id() {
+export function HomeworkStudentPageId() {
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?.userId;
 
@@ -119,7 +119,7 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 
-export function HomeworkStudentPage_id(){
+export function HomeworkStudentPageId(){
 
 
 const [loading, setLoading] = useState(true);

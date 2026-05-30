@@ -9,7 +9,7 @@ const datap = [
   { name: "Обновить фотографию профиля: ", id: 6 },
 ];
 
-export function Datap_student() {
+export function DatapStudent() {
   const [user, setUser] = useState(
     () => JSON.parse(localStorage.getItem("user")) || {},
   );

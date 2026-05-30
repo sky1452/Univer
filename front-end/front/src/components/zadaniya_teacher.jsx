@@ -11,7 +11,7 @@ export function HomeworkPage() {
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?.userId;
 
-  // Загрузка дисциплин
+  //загрузка дисциплин
   useEffect(() => {
     setLoading(true);
 
@@ -88,7 +88,6 @@ export function HomeworkPage() {
                           )
                         }
                       >
-                        {/* Можно вставить иконку или цифру */}
                       </div>
                     ) : (
                       <div className="square"></div>

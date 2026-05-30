@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config";
-export function Homework_studentPage() {
+export function HomeworkStudentPage() {
   const navigate = useNavigate();
 
   const [discipline, setDiscipline] = useState([]);

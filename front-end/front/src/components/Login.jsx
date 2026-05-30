@@ -49,7 +49,6 @@ export default function Login() {
           "user",
           JSON.stringify({
             role: selectedRole,
-
             fullName: data.fullName,
             email: data.email,
             position: data.position,

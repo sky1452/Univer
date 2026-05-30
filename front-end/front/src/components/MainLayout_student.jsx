@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { SectionsStudent } from './sections_student';
+import { SectionsStudent } from './StudentSections';
 
 export function MainLayoutStudent() {
   return (

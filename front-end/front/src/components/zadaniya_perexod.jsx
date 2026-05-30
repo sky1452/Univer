@@ -4,9 +4,9 @@ import { API_URL } from "../config";
 import { CreateHomework } from "./CreateHomework.jsx";
 import { ReceivedWorks } from "./GetHomework.jsx";
 import { CreatedHomework } from "./CreatedHomework.jsx";
-import { CheckHomework } from "./checkHomerk.jsx";
+import { CheckHomework } from "./CheckHomework.jsx";
 
-export function HomeworkPage_id() {
+export function HomeworkPageId() {
   const [mode, setMode] = useState(null);
   const [loading, setLoading] = useState(true);
 

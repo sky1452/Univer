@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { SectionsTeacher } from './sections_teacher';
+import { SectionsTeacher } from './TeacherSections';
 
 export function MainLayoutTeacher() {
   return (
