@@ -1,70 +1,119 @@
-# Getting Started with Create React App
+# Univer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Веб-приложение для организации учебного процесса с личными кабинетами студента и преподавателя.
 
-## Available Scripts
+## Ссылки
 
-In the project directory, you can run:
+🌐 [Личный кабинет](https://my-project-beryl-zeta-71.vercel.app)
 
-### `npm start`
+> Для корректной работы рекомендуется открывать приложение с компьютера или ноутбука. Мобильная версия на данный момент не предусмотрена.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Тестовые данные
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Для проверки функциональности можно использовать тестовые аккаунты.
 
-### `npm test`
+### Преподаватель
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+Логин: emelyanov.e.a@volsu.ru
+Пароль: u67MZ8qw6B
+```
 
-### `npm run build`
+### Студент
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+Логин: suhanov.n.e@volsu.ru
+Пароль: RcGpSaO5rO
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Скриншоты
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+![Авторизация](Login.png)
 
-### `npm run eject`
+![Личный кабинет студента](Student.png)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+![Расписание студента](StudentSchedule.png)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+![Личный каибнет преподаваля](Teacher.png)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+![Управление работами](Works.png)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## О проекте
 
-## Learn More
+Univer — это веб-приложение для автоматизации учебного процесса в образовательной среде.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Проект предоставляет отдельные интерфейсы для студентов и преподавателей. Студенты могут просматривать расписание, получать задания, отправлять выполненные работы в виде PDF-файлов, редактировать ответы до проверки и отслеживать свои оценки и прогресс.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Преподаватели могут создавать задания, просматривать отправленные работы студентов, скачивать прикреплённые файлы, выставлять оценки, редактировать и удалять задания.
 
-### Code Splitting
+Backend, база данных PostgreSQL и файловое хранилище Yandex Object Storage уже настроены на стороне сервера. Для просмотра демо-версии не требуется локальный запуск проекта, настройка базы данных или добавление переменных окружения.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+В последующих этапах разработки планируется усовершенство-вание текущих разделов личных кабинетов, реализация новых разделов и интеграция необходимых внешних сервисов.
 
-### Analyzing the Bundle Size
+## Основной функционал
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Для студента
 
-### Making a Progressive Web App
+- просмотр и редактирование профиля;
+- просмотр расписания занятий;
+- отправка ответов на задания;
+- просмотр оценок;
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Для преподавателя
 
-### Advanced Configuration
+- просмотр и редактирование профиля;
+- просмотр расписания занятий;
+- создание заданий;
+- редактирование заданий;
+- удаление заданий;
+- просмотр отправленных работ студентов;
+- формирование и просмотр успеваемости студентов.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Разделы приложения
 
-### Deployment
+### Личный кабинет студента
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+В личном кабинете студенту доступны следующие разделы:
 
-### `npm run build` fails to minify
+- **Домашняя страница** — персональная информация, учебная группа, электронная почта, фотография профиля, учебные дисциплины и дополнительная информация о себе.
+- **Расписание** — персональное расписание занятий с указанием времени, дисциплин, аудиторий, дней недели и преподавателей.
+- **Мои задания** — список заданий по дисциплинам, просмотр дедлайнов, отправка ответов в виде PDF-файлов и комментариев.
+- **Успеваемость** — просмотр полученных баллов, результатов промежуточных аттестаций и итоговых результатов по дисциплинам.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Личный кабинет преподавателя
+
+В личном кабинете преподавателю доступны следующие разделы:
+
+- **Домашняя страница** — персональные данные, электронная почта, фотография, должность, стаж, список дисциплин и дополнительная информация о себе.
+- **Текущее расписание** — индивидуальное расписание преподавателя с указанием времени, дисциплины, типа занятия, аудитории и учебной группы.
+- **Формирование успеваемости** — работа с результатами студентов по дисциплинам и группам.
+- **Управление работами** — создание, редактирование и удаление заданий.
+
+## Технологии
+
+### Frontend
+
+- React
+- React Router DOM
+- TanStack React Query
+- Mantine UI
+- Material UI Icons
+- Lucide React
+- React Dropzone
+- CSS
+
+### Backend
+
+- Go
+- Gorilla Mux
+- PostgreSQL
+- pgx
+- Swagger
+- Yandex Object Storage / S3
+
+### Инфраструктура
+
+- Vercel
+- PostgreSQL
+- Yandex Object Storage
+- REST API
